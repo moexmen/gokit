@@ -3,6 +3,9 @@ Useful code for our Go projects
 
 `go get -u github.com/moexmen/gokit`
 
+## Random
+Cryptographically random strings to be used for things like session IDs.
+
 ## Server
 Starts a HTTP server with graceful shutdown when receiving `SIGINT` or `SIGTERM`
 

@@ -1,13 +1,11 @@
 # GoKit
-Useful code for our Go projects
+This repository contains useful code that we use in our Go projects.
 
-`go get -u github.com/moexmen/gokit`
+### Random
+Random generates cryptographically random strings. This can be used to generate variables such as session IDs.
 
-## Random
-Cryptographically random strings to be used for things like session IDs.
-
-## Server
-Starts a HTTP server with graceful shutdown when receiving `SIGINT` or `SIGTERM`
+### Server
+Server extends the default HTTP server with graceful shutdown on receiving `SIGINT` or `SIGTERM`. The web server is a 1 to 1 replacement of http.Server's `ListenAndServe()`.
 
 Example code:
 ```
@@ -27,5 +25,4 @@ func main() {
 	log.Println(s.ListenAndServe())
 }
 ```
-
-[Docker Stop](https://docs.docker.com/compose/reference/stop/) has a default timeout of 10 seconds. We recommend to use a timeout lower than 10 seconds if you use Docker.
+If you use docker, [docker stop](https://docs.docker.com/compose/reference/stop/) has a default timeout of 10 seconds, the graceful timeout should be set to expire before then.

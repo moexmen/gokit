@@ -6,7 +6,7 @@ Random generates cryptographically random strings. This can be used to generate 
 
 ## Web
 ### FileServer
-FileServer returns a handler that serves HTTP requests with the contents of the file system rooted at root. This implementation will always returns 404 Not Found if the request is a directory, and will not serve `index.html`.
+FileServer creates a file server that serves files from from a "Root" folder. It will call "NotFound" HandlerFunc if the path contains '..' or if the file cannot be found on the system
 
 ### Server
 Server extends the default HTTP server with graceful shutdown on receiving `SIGINT` or `SIGTERM`. The web server is a 1 to 1 replacement of http.Server's `ListenAndServe()`.

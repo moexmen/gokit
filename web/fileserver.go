@@ -3,30 +3,41 @@ package web
 import (
 	"net/http"
 	"os"
+	"strings"
 )
 
-// FileServer returns a handler that serves HTTP requests with the contents of the file system rooted at root.
-// This implementation will always returns 404 Not Found if the request is a directory, and will not serve `index.html`.
-// https://groups.google.com/d/msg/golang-nuts/bStLPdIVM6w/wSKqNoaSji8J
-func FileServer(root http.Dir) http.Handler {
-	return http.FileServer(justFilesFilesystem{root})
+// FileServer creates a file server that serves files from from a "Root" folder.
+// It will call "NotFound" HandlerFunc if the path contains '..' or if the file cannot be found on the system.
+type FileServer struct {
+	Root     string
+	NotFound http.HandlerFunc
 }
 
-type justFilesFilesystem struct {
-	fs http.FileSystem
-}
-
-func (fs justFilesFilesystem) Open(name string) (http.File, error) {
-	f, err := fs.fs.Open(name)
-
-	if err != nil {
-		return nil, err
+func (f FileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if containsDotDot(r.URL.Path) {
+		f.NotFound(w, r)
+		return
 	}
-
-	stat, err := f.Stat()
-	if stat.IsDir() {
-		return nil, os.ErrNotExist
+	name := f.Root + r.URL.Path
+	if _, err := os.Stat(name); os.IsNotExist(err) {
+		f.NotFound(w, r)
+		return
 	}
-
-	return f, nil
+	http.ServeFile(w, r, name)
 }
+
+// This is copied from https://github.com/golang/go/blob/master/src/net/http/fs.go#L676
+func containsDotDot(v string) bool {
+	if !strings.Contains(v, "..") {
+		return false
+	}
+	for _, ent := range strings.FieldsFunc(v, isSlashRune) {
+		if ent == ".." {
+			return true
+		}
+	}
+	return false
+}
+
+// This is copied from https://github.com/golang/go/blob/master/src/net/http/fs.go#L688
+func isSlashRune(r rune) bool { return r == '/' || r == '\\' }

@@ -1,4 +1,6 @@
 # GoKit
+[![GoDoc](https://godoc.org/github.com/moexmen/gokit?status.svg)](https://godoc.org/github.com/moexmen/gokit)
+
 This repository contains useful code that we use in our Go projects.
 
 ## Random

@@ -6,14 +6,22 @@ import (
 	"strings"
 )
 
-// FileServer creates a file server that serves files from from a "Root" folder.
+// FileServerHandler creates a file server that serves files from from a "Root" folder.
 // It will call "NotFound" HandlerFunc if the path contains '..' or if the file cannot be found on the system.
-type FileServer struct {
+type FileServerHandler struct {
 	Root     string
 	NotFound http.HandlerFunc
 }
 
-func (f FileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// FileServer creates a FileServer that returns http.NotFound if the file cannot be found on the system
+func FileServer(root http.Dir) http.Handler {
+	return FileServerHandler{
+		Root:     string(root),
+		NotFound: http.NotFound,
+	}
+}
+
+func (f FileServerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if containsDotDot(r.URL.Path) {
 		f.NotFound(w, r)
 		return

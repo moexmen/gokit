@@ -33,7 +33,7 @@ func FileServerHandler(root string, notFound http.HandlerFunc) http.Handler {
 }
 
 func (h fileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	name := f.Root + path.Clean(r.URL.Path)
+	name := h.Root + path.Clean(r.URL.Path)
 	info, err := os.Stat(name)
 	if os.IsNotExist(err) || info.IsDir() {
 		h.NotFound(w, r)

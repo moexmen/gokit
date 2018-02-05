@@ -3,7 +3,7 @@ package web
 import (
 	"net/http"
 	"os"
-	"strings"
+	"path"
 )
 
 type fileHandler struct {
@@ -33,12 +33,7 @@ func FileServerHandler(root string, notFound http.HandlerFunc) http.Handler {
 }
 
 func (h fileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if containsDotDot(r.URL.Path) {
-		h.NotFound(w, r)
-		return
-	}
-
-	name := h.Root + r.URL.Path
+	name := f.Root + path.Clean(r.URL.Path)
 	info, err := os.Stat(name)
 	if os.IsNotExist(err) || info.IsDir() {
 		h.NotFound(w, r)
@@ -46,19 +41,3 @@ func (h fileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	http.ServeFile(w, r, name)
 }
-
-// This is copied from https://github.com/golang/go/blob/master/src/net/http/fs.go#L676
-func containsDotDot(v string) bool {
-	if !strings.Contains(v, "..") {
-		return false
-	}
-	for _, ent := range strings.FieldsFunc(v, isSlashRune) {
-		if ent == ".." {
-			return true
-		}
-	}
-	return false
-}
-
-// This is copied from https://github.com/golang/go/blob/master/src/net/http/fs.go#L688
-func isSlashRune(r rune) bool { return r == '/' || r == '\\' }

@@ -8,7 +8,7 @@ This repository contains useful code that we use in our Go projects.
 ## Examples
 
 ### web.Server
-```
+```go
 import (
 	"log"
 	"time"
